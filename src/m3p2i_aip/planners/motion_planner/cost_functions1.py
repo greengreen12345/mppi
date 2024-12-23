@@ -28,13 +28,11 @@ class Objective(object):
 
     def update_objective(self, task, goal):
         self.task = task
-        #print("self.task", self.task)
+        
         self.goal = goal if torch.is_tensor(goal) else torch.tensor(goal, device=self.device)
 
     def compute_cost(self, sim: wrapper):
-        print("self.task", self.task)
-        print("self.goal", self.goal)
-
+        
         q0 = sim._dof_state[0]
         self.n_dof = q0.shape[0]
 
@@ -196,7 +194,6 @@ class Objective(object):
             cubeB_position = sim.get_actor_position_by_name("cubeB")
             cubeA_position = sim.get_actor_position_by_name("cubeA")
             
-
         coll_cost = torch.sum(torch.abs(obs_force[:, :2]), dim=1)  # [num_envs]
         # Binary check for collisions.
         coll_cost[coll_cost > 0.1] = 1
@@ -237,7 +234,7 @@ class Objective(object):
 
         return 190 * self.closest_dist_all
 
-    # Calculate the positions of various points on the obstacle.
+    # Calculate the positions of various points on the obstacle
     def obs_positions(self, sim):
 
         device = sim.device
@@ -279,8 +276,6 @@ class Objective(object):
             all_vertices.append(vertices)
 
         return torch.vstack(all_vertices).to(device)
-
-
 
     def distance_repulsion_nn(self, sim, q_prev, aot=False):
         device = sim.device
@@ -327,10 +322,7 @@ class Objective(object):
                     .unsqueeze(1)
                     .repeat(1, self.n_closest_obs)
                     + sphere_idx_arr * n_inputs
-            )
-
-            
-
+            )            
             nn_input = nn_input[new_mask_idx.flatten(), :]
 
         with record_function("TAG: evaluate NN_4 (forward+backward pass)"):
@@ -363,17 +355,13 @@ class Objective(object):
             # distance - mindist
             distance = nn_dist[:, 0]
         return distance, self.nn_grad
-   
-   
+      
     def build_nn_input(self, q_tens, obs_tens):
         
-
         self.nn_input = torch.hstack(
             (q_tens.tile(obs_tens.shape[0], 1), obs_tens.repeat_interleave(q_tens.shape[0], 0)))
         return self.nn_input
-
     
-
     def update_obstacles(self, obs):
         self.obs = obs
         self.n_obs = obs.shape[0]
