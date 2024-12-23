@@ -6,8 +6,8 @@ Download the neutral network trained model for obstacle avoidance from https://g
 
 ### Define the obstacle positions
 Refer to the definition of obstacles in the "OptimalModulationDS" method as follows. For each vector in the tensor, the first three elements represent the position of the obstacle's center, and the fourth element is the defined threshold for the minimum distance from the obstacle. Each of them can be approximated as a sphere.
->[!NOTE]
-# Obstacle spheres (x, y, z, r)
+>[!]
+    # Obstacle spheres (x, y, z, r)
     obs = torch.tensor([[6, 2, 0, .5],
                         [4., -1, 0, .5],
                         [5, 0, 0, .5]]).to(**params)
