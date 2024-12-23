@@ -13,12 +13,6 @@ sys.path.append('/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/mlp_learn')
 from sdf.robot_sdf import RobotSdfCollisionNet
 
 
-
-print("**************", torch.cuda.is_available())
-print(torch.version.cuda)
-print(torch.__version__)
-
-
 '''
 Run in the command line:
     python3 reactive_tamp.py task=navigation goal="[-3, 3]"
@@ -49,14 +43,6 @@ class REACTIVE_TAMP:
         )
         self.cfg = cfg
 
-        # DOF = 7
-        # L = 1
-        # # Load nn model
-        # s = 256
-        # n_layers = 5
-        # skips = []
-        # fname = '%ddof_sdf_%dx%d_mesh.pt' % (DOF, s, n_layers)
-
         DOF = 7
         L = 1
 
@@ -66,8 +52,7 @@ class REACTIVE_TAMP:
         skips = []
         fname = '%ddof_sdf_%dx%d_mesh.pt' % (DOF, s, n_layers) # planar robot
         #fname = 'franka_%dx%d.pt' % (s, n_layers)  # franka robot
-        #fname = '/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/mlp_learn/models/7dof_sdf_256x5_mesh.pt'
-
+       
         if skips == []:
             n_layers -= 1
 
@@ -78,23 +63,14 @@ class REACTIVE_TAMP:
         print("-----------------------------------2")
         nn_model.model.to(**params)
         # prepare models: standard (used for AOT implementation), jit, jit+quantization
-        nn_model.model_jit = nn_model.model
-
-        # nn_model.model_jit_q = torch.quantization.quantize_dynamic(
-        #     nn_model.model, qconfig_spec={torch.nn.Linear}, dtype=torch.qint8
-        # )
-
+        nn_model.model_jit = nn_model.model        
         nn_model.model_jit = torch.jit.script(nn_model.model_jit)
         nn_model.model_jit = torch.jit.optimize_for_inference(nn_model.model_jit)
-
-        # nn_model.model_jit_q = torch.jit.script(nn_model.model_jit)
-        # nn_model.model_jit_q = torch.jit.optimize_for_inference(nn_model.model_jit)
-
+       
         nn_model.update_aot_lambda()
 
         self.objective = Objective(cfg, nn_model)
-        #self.objective = Objective(cfg)
-
+        
         self.task_planner = task_planner.set_task_planner(cfg)
         self.task_success = False
         

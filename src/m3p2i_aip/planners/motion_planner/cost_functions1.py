@@ -3,31 +3,6 @@ from m3p2i_aip.utils import skill_utils
 import m3p2i_aip.utils.isaacgym_utils.isaacgym_wrapper as wrapper
 from torch.profiler import record_function
 
-
-# import sys
-# sys.path.append('../../../../../mlp_learn/')
-# from sdf.robot_sdf import RobotSdfCollisionNet
-#
-# params = {'device': 'cpu', 'dtype': torch.float32}
-#
-# # robot parameters
-# DOF = 2
-#
-# # nn loading
-# s = 256
-# n_layers = 5
-# skips = []
-# fname = '%ddof_sdf_%dx%d_mesh.pt' % (DOF, s, n_layers)
-# if skips == []:
-#     n_layers -= 1
-# nn_model = RobotSdfCollisionNet(in_channels=DOF + 3, out_channels=DOF, layers=[s] * n_layers, skips=skips)
-# nn_model.load_weights('../../../mlp_learn/models/' + fname, params)
-# nn_model.model.to(**params)
-# nn_model.model_jit = nn_model.model
-# nn_model.model_jit = torch.jit.script(nn_model.model_jit)
-# nn_model.model_jit = torch.jit.optimize_for_inference(nn_model.model_jit)
-# nn_model.update_aot_lambda()
-
 class Objective(object):
     def __init__(self, cfg, nn_model):
         self.cfg = cfg
@@ -83,11 +58,9 @@ class Objective(object):
             task_cost = self.get_panda_pick_cost(sim, self.goal)
         elif self.task == "place":
             return self.get_panda_place_cost(sim)
-        #return task_cost + self.get_motion_cost(sim)
-        print(f"task_cost shape: {task_cost.shape}")
-
+        
         get_motion_cost_1 = self.get_motion_cost_1(sim)
-        print(f"motion_cost shape: {get_motion_cost_1.shape}")
+        
         return get_motion_cost_1 + task_cost
 
     def get_navigation_cost(self, sim: wrapper):
@@ -222,10 +195,7 @@ class Objective(object):
             shelf_position = sim.get_actor_position_by_name("shelf_stand")
             cubeB_position = sim.get_actor_position_by_name("cubeB")
             cubeA_position = sim.get_actor_position_by_name("cubeA")
-            print("table的位置:", table_position)
-            print("shelf的位置:", shelf_position)
-            print("cubeB的位置:", cubeB_position)
-            print("cubeA的位置:", cubeA_position)
+            
 
         coll_cost = torch.sum(torch.abs(obs_force[:, :2]), dim=1)  # [num_envs]
         # Binary check for collisions.
@@ -245,28 +215,9 @@ class Objective(object):
         # return (self.closest_dist_all < 0).sum(dim=1)
 
     def get_motion_cost_1(self, sim: wrapper):
-        #q_prev = sim._dof_state[0]
+        
         q_prev = sim._dof_state
-        print("q_prev:", q_prev)
-        #print("sim.robot_pos", sim.robot_pos)
-        print("sim._dof_state:", sim._dof_state)
-        print("sim._dof_state.shape:", sim._dof_state.shape)
-        print(f"sim._dof_state[0].shape: {sim._dof_state[0].shape}")
-
-        # TODO:通过sim得到各障碍物的点
-        # cubeA_size = sim.get_actor_size("cubeA")
-        # dynObs_size = sim.get_actor_size("dyn-obs")
-        # dynObs_position = sim.get_actor_position_by_name("dyn-obs")
-
-        # if self.cfg.env_type == 'panda_env':
-        #     self.obs
-
-        # 示例：
-        # # Obstacle spheres (x, y, z, r)
-        # obs = torch.tensor([[6, 2, 0, .5],
-        #                     [4., -1, 0, .5],
-        #                     [5, 0, 0, .5]]).to(**params)
-
+        
         # evaluate NN. Calculate kernel bases on first iteration
         distance, self.nn_grad = self.distance_repulsion_nn(sim, q_prev, aot=False)
         self.nn_grad = self.nn_grad[0:self.N_traj, :]  # fixes issue with aot_function cache
@@ -284,11 +235,9 @@ class Objective(object):
         self.closest_dist_all[self.closest_dist_all < 1.8] = 1
         self.closest_dist_all[self.closest_dist_all > 1.8] = 0
 
-        #return 1000 * self.closest_dist_all
-        #return 200 * self.closest_dist_all
         return 190 * self.closest_dist_all
 
-    #计算障碍物的各点的位置
+    # Calculate the positions of various points on the obstacle.
     def obs_positions(self, sim):
 
         device = sim.device
@@ -300,24 +249,21 @@ class Objective(object):
             size = sim.get_actor_size(actor_name)
             position = sim.get_actor_position_by_name(actor_name)
 
-            # 给定的参数
-            center = position[0, :2]  # 中点位置，形状为 (2,)
-            length = size[0]  # 长度
-            width = size[1]  # 宽度
+            # The given parameters
+            center = position[0, :2]  # Midpoint position with a shape of (2,)
+            length = size[0]  
+            width = size[1]  
             radius = size[2]/2
 
-            # 转换 radius 为 Tensor，并确保设备一致
+            # Convert radius to a Tensor and ensure device consistency
             radius = torch.tensor([radius], device=position.device) if not isinstance(radius, torch.Tensor) else radius
-
             center = center.to(device)
 
-
-            # 计算偏移量
+            # Calculate the offset
             half_length = length / 2
             half_width = width / 2
 
-            # 计算四个顶点的坐标
-
+            # Calculate the coordinates of the four vertices
             top_left = center + torch.tensor([-half_length, half_width], device=device)
             top_right = center + torch.tensor([half_length, half_width], device=device)
             bottom_left = center + torch.tensor([-half_length, -half_width], device=device)
@@ -328,12 +274,7 @@ class Objective(object):
             bottom_left = torch.cat([bottom_left, position[0, 2].unsqueeze(0), radius])
             bottom_right = torch.cat([bottom_right, position[0, 2].unsqueeze(0), radius])
 
-            #top_left = torch.cat([top_left, position[0, 2], radius])
-            # top_right = torch.cat([top_right, position[0, 2], radius])
-            # bottom_left = torch.cat([bottom_left, position[0, 2], radius])
-            # bottom_right = torch.cat([bottom_right, position[0, 2], radius])
-
-            # 拼接成一个张量
+            # Concatenate into a tensor
             vertices = torch.stack([top_left, top_right, bottom_left, bottom_right], dim=0)
             all_vertices.append(vertices)
 
@@ -343,11 +284,7 @@ class Objective(object):
 
     def distance_repulsion_nn(self, sim, q_prev, aot=False):
         device = sim.device
-
-        # 打印设备信息以便调试
-        # print(f"sim.device: {device}")
-        #q_prev = q_prev[:32]
-
+    
         n_inputs = q_prev.shape[0]
         self.obs = self.obs_positions(sim).to(device)
         self.n_obs = self.obs.shape[0]
@@ -356,44 +293,15 @@ class Objective(object):
             # building input tensor for NN (N_traj * n_obs, n_dof + 3)
             nn_input = self.build_nn_input(q_prev, self.obs).to(device)
 
-            # print(f"nn_input shape before slicing: {nn_input.shape}")
-
-        # 打印输入张量和模型设备
-        # print(f"nn_input device: {nn_input.device}")
-        # print(f"Model: {self.nn_model.model_jit}")
-
-        # parameters = list(self.nn_model.model_jit.parameters())
-        # if not parameters:
-        #     print("No parameters found in the TorchScript model.")
-        # else:
-        #     print(f"Model has {len(parameters)} parameters.")
-
-        #print(f"Model device: {next(self.nn_model.model_jit.parameters()).device}")
-
         with record_function("TAG: evaluate NN_2 (forward pass)"):
-            # 确保模型在目标设备上
-            self.nn_model.model_jit = self.nn_model.model_jit.to(device)
-
-            print(f"Input shape: {nn_input[:, 0:-1].shape}")
-            print(f"nn_input shape: {nn_input.shape}")
-            #
-            # print(self.nn_model.model_jit.graph)
-            # print(self.nn_model.model_jit)
-
-            #nn_input = nn_input[:, :10]
             
-
-            # doing single forward pass to figure out the closest obstacle for each configuration
-            #nn_dist = self.nn_model.model_jit.forward(nn_input[:, 0:-1])
-            #nn_dist = self.nn_model.model_jit.forward(nn_input)
-
+            self.nn_model.model_jit = self.nn_model.model_jit.to(device)
+                      
+            # doing single forward pass to figure out the closest obstacle for each configuration            
             padding = torch.zeros(nn_input.size(0), 31 - nn_input.size(1), device=nn_input.device)
             nn_input_padded = torch.cat((nn_input, padding), dim=1)
             nn_dist = self.nn_model.model_jit.forward(nn_input_padded[:, 0:-1])
-
-            print("nn_dist:", nn_dist)
-            print("nn_dist.shape:", nn_dist.shape)
-
+          
             if self.nn_model.out_channels == 9:
                 nn_dist = nn_dist / 100  # scale down to meters
         with record_function("TAG: evaluate NN_3 (get closest obstacle)"):
@@ -404,31 +312,15 @@ class Objective(object):
             #nn_dist -= nn_input[:, -1].unsqueeze(1)  # subtract radius
             nn_dist[:, self.ignored_links] = 1e6  # ignore specified links
             mindist, _ = nn_dist.min(1)
-
-            # required_size = self.n_obs * n_inputs
-            # if mindist.numel() < required_size:
-            #     padded_mindist = torch.zeros(required_size, device=device)
-            #     padded_mindist[:mindist.numel()] = mindist
-            #     mindist = padded_mindist
-
+           
             mindist_matrix = mindist.reshape(self.n_obs, n_inputs).transpose(0, 1)
             mindist, sphere_idx = mindist_matrix.min(1)
             sort_dist, sort_idx = mindist_matrix.sort(dim=1)
             mindist_arr = sort_dist[:, 0:self.n_closest_obs]
             sphere_idx_arr = sort_idx[:, 0:self.n_closest_obs]
-            # mask_idx = self.traj_range[:n_inputs] + sphere_idx * n_inputs
-            #mask_idx = torch.arange(n_inputs) + sphere_idx * n_inputs
-            # Ensure all tensors are on the same device
-            # sphere_idx = sphere_idx.to(device)
-            # sphere_idx_arr = sphere_idx_arr.to(device)
-
+            
             mask_idx = torch.arange(n_inputs, device=device) + sphere_idx * n_inputs
-
-            # nn_input = nn_input[mask_idx, :]
-
-            # new_mask_idx = torch.arange(n_inputs).unsqueeze(1).repeat(1, self.n_closest_obs) + sphere_idx_arr * n_inputs
-            # nn_input = nn_input[new_mask_idx.flatten(), :]
-
+         
             # Handle new mask_idx for closest obstacles
             new_mask_idx = (
                     torch.arange(n_inputs, device=device)
@@ -437,38 +329,20 @@ class Objective(object):
                     + sphere_idx_arr * n_inputs
             )
 
-            # 限制索引范围
-            # if new_mask_idx.max() >= nn_input.shape[0]:
-            #     print("Index out of bounds detected. Adjusting indices...")
-            #     new_mask_idx = new_mask_idx.clamp(0, nn_input.shape[0] - 1)
+            
 
             nn_input = nn_input[new_mask_idx.flatten(), :]
 
         with record_function("TAG: evaluate NN_4 (forward+backward pass)"):
             # forward + backward pass to get gradients for closest obstacles
             # nn_dist, nn_grad, nn_minidx = self.nn_model.compute_signed_distance_wgrad(nn_input[:, 0:-1], 'closest')
-            # print(f"x_nerf shape: {x_nerf.shape}")
-            # print(f"Layer 0 expected in_features: {self.layers[0].in_features}")
-
-            #nn_dist, nn_grad, nn_minidx = self.nn_model.dist_grad_closest(nn_input)
-
-
+                    
             if aot:
                 nn_dist, nn_grad, nn_minidx = self.nn_model.dist_grad_closest_aot(nn_input)
-            else:
-                #nn_dist, nn_grad, nn_minidx = self.nn_model.dist_grad_closest(nn_input)
-                print("神经网络nn_input_padded[:, 0:-1]调用前", nn_input_padded[:, 0:-1].shape)
+            else:                                                
                 nn_dist, nn_grad, nn_minidx = self.nn_model.dist_grad_closest(nn_input_padded[:, 0:-1])
                 nn_grad = nn_grad.squeeze(2)
-
-                print("神经网络nn_dist", nn_dist.shape)
-                print("神经网络nn_input_padded[:, 0:-1]调用后", nn_input_padded[:, 0:-1].shape)
-            # if aot:
-            #     nn_dist, nn_grad, nn_minidx = self.nn_model.dist_grad_closest_aot(nn_input)
-            # else:
-            #     nn_dist, nn_grad, nn_minidx = self.nn_model.dist_grad_closest(nn_input)
-            #     nn_grad = nn_grad.squeeze(2)
-
+                
             self.nn_grad = nn_grad[:nn_input.shape[0], 0:self.n_dof]
             if self.nn_model.out_channels == 9:
                 nn_dist = nn_dist / 100  # scale down to meters
@@ -476,8 +350,7 @@ class Objective(object):
         with record_function("TAG: evaluate NN_5 (process outputs)"):
 
             # cleaning up to get distances and gradients for closest obstacles
-            print(f"nn_dist shape: {nn_dist.shape}")
-            print(f"nn_input shape: {nn_input.shape}")
+            
             nn_dist -= nn_input[:, -1].unsqueeze(1)  # subtract radius and some threshold
             # extract closest link distance
             nn_dist = nn_dist[torch.arange(self.n_closest_obs * n_inputs).unsqueeze(1), nn_minidx.unsqueeze(1)]
@@ -490,42 +363,16 @@ class Objective(object):
             # distance - mindist
             distance = nn_dist[:, 0]
         return distance, self.nn_grad
-
-    # def build_nn_input(self, q_tens, obs_tens):
-    #     print("q_prev shape:", q_tens.shape)
-    #     print("obs shape:", obs_tens.shape)
-    #
-    #     self.nn_input = torch.hstack(
-    #         (q_tens.tile(obs_tens.shape[0], 1), obs_tens.repeat_interleave(q_tens.shape[0], 0)))
-    #     return self.nn_input
-
+   
+   
     def build_nn_input(self, q_tens, obs_tens):
-        print(f"q_tens shape: {q_tens.shape}")
-        print(f"obs_tens shape: {obs_tens.shape}")
+        
 
         self.nn_input = torch.hstack(
             (q_tens.tile(obs_tens.shape[0], 1), obs_tens.repeat_interleave(q_tens.shape[0], 0)))
         return self.nn_input
 
-    # def build_nn_input(self, q_tens, obs_tens):
-    #     print("q_prev shape:", q_tens.shape)
-    #     print("obs shape:", obs_tens.shape)
-    #
-    #     # 确保 q_tens 是 2D 张量
-    #     if q_tens.dim() == 1:
-    #         q_tens = q_tens.unsqueeze(0)  # [1, 18]
-    #
-    #     # 扩展 q_tens 和 obs_tens
-    #     q_tens_expanded = q_tens.repeat(obs_tens.shape[0], 1)  # [16, 18]
-    #     obs_tens_expanded = obs_tens.repeat_interleave(q_tens.shape[0], dim=0)  # [16, 4]
-    #
-    #     # 打印调试
-    #     print("q_tens_expanded shape:", q_tens_expanded.shape)
-    #     print("obs_tens_expanded shape:", obs_tens_expanded.shape)
-    #
-    #     # 拼接张量
-    #     self.nn_input = torch.hstack((q_tens_expanded, obs_tens_expanded))
-    #     return self.nn_input
+    
 
     def update_obstacles(self, obs):
         self.obs = obs
