@@ -13,3 +13,9 @@ Refer to the definition of obstacles in the "OptimalModulationDS" method as foll
                         [5, 0, 0, .5]]).to(**params)
 
       
+````bash
+    # Obstacle spheres (x, y, z, r)
+    obs = torch.tensor([[6, 2, 0, .5],
+                        [4., -1, 0, .5],
+                        [5, 0, 0, .5]]).to(**params)
+````
