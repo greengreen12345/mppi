@@ -1,0 +1,66 @@
+mppi:
+  num_samples: 200
+  horizon: 15
+  nx: 4
+  mppi_mode: halton-spline
+  sampling_method: halton
+  noise_sigma:
+  - - 3.0
+    - 0.0
+  - - 0.0
+    - 3.0
+  noise_mu: null
+  device: cuda:0
+  lambda_: 0.5
+  update_lambda: false
+  update_cov: false
+  u_min:
+  - -3.0
+  - -3.0
+  u_max:
+  - 3.0
+  - 3.0
+  u_init: 0.0
+  U_init: null
+  u_scale: 1.0
+  u_per_command: 15
+  rollout_var_discount: 0.95
+  sample_null_action: true
+  sample_previous_plan: true
+  sample_other_priors: false
+  noise_abs_cost: false
+  filter_u: true
+  use_priors: false
+  seed_val: 0
+  eta_u_bound: 10
+  eta_l_bound: 5
+isaacgym:
+  dt: 0.05
+  substeps: 2
+  use_gpu_pipeline: true
+  num_threads: 8
+  viewer: false
+  spacing: 10.0
+  camera_pos:
+  - 1.5
+  - 6.0
+  - 8.0
+  camera_target:
+  - 1.5
+  - 0.0
+  - 0.0
+render: ???
+n_steps: ???
+env_type: point_env
+task: push
+goal:
+- -3.75
+- -3.75
+nx: ???
+actors: ???
+initial_actor_positions: ???
+kp_suction: 400
+suction_active: true
+multi_modal: false
+pre_height_diff: 0.0
+cube_on_shelf: false

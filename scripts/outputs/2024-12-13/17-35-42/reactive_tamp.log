@@ -1,0 +1,17 @@
+[2024-12-13 17:36:08,012][zerorpc.core][ERROR] - 
+Traceback (most recent call last):
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/zerorpc/core.py", line 153, in _async_task
+    functor.pattern.process_call(self._context, bufchan, event, functor)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/zerorpc/patterns.py", line 30, in process_call
+    result = functor(*req_event.args)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/zerorpc/decorators.py", line 44, in __call__
+    return self._functor(*args, **kargs)
+  File "reactive_tamp.py", line 125, in run_tamp
+    self.motion_planner.command(self.sim._dof_state[0])[0]
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/mppi.py", line 245, in command
+    cost_total = self._compute_total_cost_batch_halton()
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/mppi.py", line 419, in _compute_total_cost_batch_halton
+    self.cost_total, self.states, self.actions, self.ee_states = self._compute_rollout_costs(self.perturbed_action)
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/mppi.py", line 309, in _compute_rollout_costs
+    cost_samples += c
+RuntimeError: The size of tensor a (200) must match the size of tensor b (18) at non-singleton dimension 0

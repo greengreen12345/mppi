@@ -1,0 +1,30 @@
+[2024-12-12 16:52:27,566][zerorpc.core][ERROR] - 
+Traceback (most recent call last):
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/zerorpc/core.py", line 153, in _async_task
+    functor.pattern.process_call(self._context, bufchan, event, functor)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/zerorpc/patterns.py", line 30, in process_call
+    result = functor(*req_event.args)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/zerorpc/decorators.py", line 44, in __call__
+    return self._functor(*args, **kargs)
+  File "reactive_tamp.py", line 123, in run_tamp
+    self.motion_planner.command(self.sim._dof_state[0])[0]
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/mppi.py", line 244, in command
+    cost_total = self._compute_total_cost_batch_halton()
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/mppi.py", line 418, in _compute_total_cost_batch_halton
+    self.cost_total, self.states, self.actions, self.ee_states = self._compute_rollout_costs(self.perturbed_action)
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/mppi.py", line 305, in _compute_rollout_costs
+    c = self._running_cost(state) # every time stes you get nsamples cost, we need that as output for the discount factor
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/mppi.py", line 209, in _running_cost
+    return self.running_cost(state)
+  File "reactive_tamp.py", line 136, in running_cost
+    return self.objective.compute_cost(self.sim)
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/cost_functions1.py", line 77, in compute_cost
+    return task_cost + self.get_motion_cost_1(sim)
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/cost_functions1.py", line 251, in get_motion_cost_1
+    distance, self.nn_grad = self.distance_repulsion_nn(sim, q_prev, aot=True)
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/cost_functions1.py", line 327, in distance_repulsion_nn
+    nn_dist = self.nn_model.model_jit.forward(nn_input[:, 0:-1])
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript (most recent call last):
+RuntimeError: Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu! (when checking argument for argument mat2 in method wrapper_mm)
+

@@ -1,0 +1,115 @@
+[2024-12-12 21:34:08,777][zerorpc.core][ERROR] - 
+Traceback (most recent call last):
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/functorch/_src/aot_autograd.py", line 64, in preserve_rng_state
+    yield
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/functorch/_src/aot_autograd.py", line 512, in create_aot_dispatcher_function
+    return aot_dispatch_base(flat_fn, fake_flat_tensor_args, aot_config)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/functorch/_src/aot_autograd.py", line 277, in aot_dispatch_base
+    fw_module = make_fx(flat_fn, aot_config.decompositions)(*flat_args)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/fx/experimental/proxy_tensor.py", line 652, in wrapped
+    t = dispatch_trace(wrap_key(func, args, fx_tracer), tracer=fx_tracer, concrete_args=tuple(phs))
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/fx/experimental/proxy_tensor.py", line 400, in dispatch_trace
+    graph = tracer.trace(root, concrete_args)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/fx/_symbolic_trace.py", line 739, in trace
+    (self.create_arg(fn(*args)),),
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/fx/experimental/proxy_tensor.py", line 414, in wrapped
+    out = f(*tensors)
+  File "<string>", line 1, in <lambda>
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/functorch/_src/aot_autograd.py", line 636, in flat_fn
+    tree_out = fn(*args, **kwargs)
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/mlp_learn/sdf/robot_sdf.py", line 154, in functorch_vjp
+    dists, vjp_fn = vjp(self.model.forward, points)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/functorch/_src/eager_transforms.py", line 262, in vjp
+    return _vjp_with_argnums(func, *primals, has_aux=has_aux)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/functorch/_src/vmap.py", line 35, in fn
+    return f(*args, **kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/functorch/_src/eager_transforms.py", line 289, in _vjp_with_argnums
+    primals_out = func(*primals)
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/mlp_learn/sdf/network_macros_mod.py", line 143, in forward
+    y = self.layers[0](x_nerf)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/fx/_symbolic_trace.py", line 717, in module_call_wrapper
+    return self.call_module(mod, forward, args, kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/fx/experimental/proxy_tensor.py", line 366, in call_module
+    return forward(*args, **kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/fx/_symbolic_trace.py", line 710, in forward
+    return _orig_module_call(mod, *args, **kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/nn/modules/container.py", line 204, in forward
+    input = module(input)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/fx/_symbolic_trace.py", line 717, in module_call_wrapper
+    return self.call_module(mod, forward, args, kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/fx/experimental/proxy_tensor.py", line 366, in call_module
+    return forward(*args, **kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/fx/_symbolic_trace.py", line 710, in forward
+    return _orig_module_call(mod, *args, **kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/nn/modules/container.py", line 204, in forward
+    input = module(input)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/fx/_symbolic_trace.py", line 717, in module_call_wrapper
+    return self.call_module(mod, forward, args, kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/fx/experimental/proxy_tensor.py", line 366, in call_module
+    return forward(*args, **kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/fx/_symbolic_trace.py", line 710, in forward
+    return _orig_module_call(mod, *args, **kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/nn/modules/linear.py", line 114, in forward
+    return F.linear(input, self.weight, self.bias)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/utils/_python_dispatch.py", line 101, in __torch_dispatch__
+    return old.__torch_dispatch__(func, types, args, kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/fx/experimental/proxy_tensor.py", line 440, in __torch_dispatch__
+    return self.inner_torch_dispatch(func, types, args, kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/fx/experimental/proxy_tensor.py", line 465, in inner_torch_dispatch
+    out = proxy_call(self, func, args, kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/fx/experimental/proxy_tensor.py", line 304, in proxy_call
+    out = func(*args, **kwargs)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/_ops.py", line 257, in __call__
+    return self._op(*args, **kwargs or {})
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (72x27 and 30x256)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/zerorpc/core.py", line 153, in _async_task
+    functor.pattern.process_call(self._context, bufchan, event, functor)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/zerorpc/patterns.py", line 30, in process_call
+    result = functor(*req_event.args)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/zerorpc/decorators.py", line 44, in __call__
+    return self._functor(*args, **kargs)
+  File "reactive_tamp.py", line 124, in run_tamp
+    self.motion_planner.command(self.sim._dof_state[0])[0]
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/mppi.py", line 244, in command
+    cost_total = self._compute_total_cost_batch_halton()
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/mppi.py", line 418, in _compute_total_cost_batch_halton
+    self.cost_total, self.states, self.actions, self.ee_states = self._compute_rollout_costs(self.perturbed_action)
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/mppi.py", line 305, in _compute_rollout_costs
+    c = self._running_cost(state) # every time stes you get nsamples cost, we need that as output for the discount factor
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/mppi.py", line 209, in _running_cost
+    return self.running_cost(state)
+  File "reactive_tamp.py", line 137, in running_cost
+    return self.objective.compute_cost(self.sim)
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/cost_functions1.py", line 77, in compute_cost
+    return task_cost + self.get_motion_cost_1(sim)
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/cost_functions1.py", line 251, in get_motion_cost_1
+    distance, self.nn_grad = self.distance_repulsion_nn(sim, q_prev, aot=True)
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/motion_planner/cost_functions1.py", line 407, in distance_repulsion_nn
+    nn_dist, nn_grad, nn_minidx = self.nn_model.dist_grad_closest_aot(nn_input[:, 0:-1])
+  File "/home/my/m3p2i-aip-master/src/m3p2i_aip/planners/mlp_learn/sdf/robot_sdf.py", line 161, in dist_grad_closest_aot
+    return self.aot_lambda(q)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/functorch/_src/aot_autograd.py", line 656, in returned_function
+    compiled_fn = create_aot_dispatcher_function(
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/functorch/_src/aot_autograd.py", line 512, in create_aot_dispatcher_function
+    return aot_dispatch_base(flat_fn, fake_flat_tensor_args, aot_config)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/contextlib.py", line 131, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/functorch/_src/aot_autograd.py", line 68, in preserve_rng_state
+    torch.cuda.set_rng_state(cuda_rng_state)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/cuda/random.py", line 64, in set_rng_state
+    _lazy_call(cb)
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/cuda/__init__.py", line 165, in _lazy_call
+    callable()
+  File "/home/my/anaconda3/envs/m3p2i-aip/lib/python3.8/site-packages/torch/cuda/random.py", line 62, in cb
+    default_generator.set_state(new_state_copy)
+RuntimeError: false INTERNAL ASSERT FAILED at "../c10/cuda/CUDAGraphsC10Utils.h":73, please report a bug to PyTorch. Unknown CUDA graph CaptureStatus32742
