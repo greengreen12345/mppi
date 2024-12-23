@@ -5,7 +5,7 @@
 Download the neutral network trained model for obstacle avoidance from https://github.com/epfl-lasa/OptimalModulationDS/tree/master/python_scripts/mlp_learn and move it to https://github.com/greengreen12345/mppi/tree/main/src/m3p2i_aip/planners. 
 
 ### Load the neural network model
-Load the nn_model "7dof_sdf_256x5_mesh.pt" in scripts/reactive_tamp.py.
+Load the nn_model "7dof_sdf_256x5_mesh.pt" in "scripts/reactive_tamp.py def __init__()" as follows:
 ````bash
         DOF = 7
         L = 1
@@ -19,8 +19,10 @@ Load the nn_model "7dof_sdf_256x5_mesh.pt" in scripts/reactive_tamp.py.
         nn_model = RobotSdfCollisionNet(in_channels=DOF + 3, out_channels=DOF, layers=[s] * n_layers, skips=skips)
        
 ````
-
-
+Then input nn_model into the "Objective" class:
+````bash
+self.objective = Objective(cfg, nn_model)
+````
 
 
 ### Define the obstacle positions
