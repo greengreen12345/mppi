@@ -24,8 +24,8 @@ Then input nn_model into the "Objective" class:
 self.objective = Objective(cfg, nn_model)
 ````
 
-
-### Define the obstacle positions
+### Modify cost_function.py to cost_function1.py
+#### Define the obstacle positions
 Refer to the definition of obstacles in the "OptimalModulationDS" method as follows. For each vector in the tensor, the first three elements represent the position of the obstacle's center, and the fourth element is the defined threshold for the minimum distance from the obstacle. Each of them can be approximated as a sphere.
       
 ````bash
