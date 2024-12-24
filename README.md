@@ -110,7 +110,7 @@ distance, self.nn_grad = self.distance_repulsion_nn(sim, q_prev, aot=False)
 ````
 
 
-After calculating the total cost in function "def compute_cost(self, sim: wrapper):", this function is called in the [mppi file](https://github.com/greengreen12345/mppi/blob/main/src/m3p2i_aip/planners/motion_planner/mppi.py#L309) in function "def _compute_rollout_costs(self, perturbed_actions):" as follows:
+After calculating the total cost in function "def compute_cost(self, sim: wrapper):" in cost_functions1.py, this function is called in the [mppi file](https://github.com/greengreen12345/mppi/blob/main/src/m3p2i_aip/planners/motion_planner/mppi.py#L309) in function "def _compute_rollout_costs(self, perturbed_actions):" as follows:
 
 ````bash
 for t in range(T):
